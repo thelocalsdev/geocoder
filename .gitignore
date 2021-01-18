@@ -3,6 +3,7 @@ rdoc/*
 *.gem
 .bundle
 .ruby-version
+.idea
 Gemfile.lock
 api_keys.yml
 test/geocoder_test.sqlite
