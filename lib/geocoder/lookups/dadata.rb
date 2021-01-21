@@ -27,7 +27,7 @@ module Geocoder::Lookup
       Geocoder.log(:debug, "Geocoder: HTTP request being made for #{uri.to_s}")
       http_client.start(uri.host, uri.port, use_ssl: use_ssl?, open_timeout: configuration.timeout, read_timeout: configuration.timeout) do |client|
         configure_ssl!(client) if use_ssl?
-        req = Net::HTTP::Post.new(uri.request_uri, configuration.http_headers)
+        req = Net::HTTP::Post.new(uri.request_uri, http_headers)
         req.body = request_body(query)
         client.request(req)
       end
@@ -54,6 +54,14 @@ module Geocoder::Lookup
         Geocoder.log(:warn, "DADATA Geocoding API error: unexpected response format.")
         return []
       end
+    end
+
+    def http_headers
+      {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': "Token #{configuration.api_key}"
+      }
     end
 
     def request_body(query)
