@@ -65,10 +65,9 @@ module Geocoder::Lookup
     end
 
     def request_body(query)
-      params = {
-          query: query.sanitized_text,
-        }
+      params = {query: query.sanitized_text}
       params[:locations] = query.options[:regions].map{ |id| {"region_fias_id": id} } if query.options[:regions]
+      params[:locations_boost] = query.options[:locations_boost].map{ |id| {"kladr_id": id} } if query.options[:locations_boost]
       params.to_json
     end
   end
