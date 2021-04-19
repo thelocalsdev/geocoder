@@ -19,7 +19,12 @@ module Geocoder::Lookup
     private # ---------------------------------------------------------------
 
     def base_query_url(query)
-      "#{protocol}://suggestions.dadata.ru/suggestions/api/4_1/rs/suggest/address?"
+      base = "#{protocol}://suggestions.dadata.ru/suggestions/api/4_1/rs"
+      if query.reverse_geocode?
+        "#{base}/geolocate/address?"
+      else
+        "#{base}/suggest/address?"
+      end
     end
 
     def make_api_request(query)
@@ -65,7 +70,14 @@ module Geocoder::Lookup
     end
 
     def request_body(query)
-      params = {query: query.sanitized_text}
+      params = {}
+      if query.reverse_geocode?
+        params[:lat] = query.coordinates.first
+        params[:lon] = query.coordinates.last
+      else
+        params[:query] = query.sanitized_text
+      end
+
       params[:locations] = query.options[:regions].map{ |id| {"region_fias_id": id} } if query.options[:regions]
       params[:locations_boost] = query.options[:locations_boost].map{ |id| {"kladr_id": id} } if query.options[:locations_boost]
       params.to_json
